@@ -27,11 +27,18 @@ class Blob {
     fill(1,0);
     stroke(1,1,1);
     rect(min.x, min.y, max.x-min.x, max.y-min.y);
-    stroke(.5,1,1);
+    stroke(.33,1,1);
     rect(min.x-threshold, min.y-threshold, max.x-min.x+threshold*2, max.y-min.y+threshold*2);
+    stroke(.66,1,1);
+    rect((min.x+max.x)*.5-5, (min.y+max.y)*.5-5, 10, 10);
   }
-  void mergeWith(Blob otherBlob){
-    // this OR the other blob need to be removed from the arraylist
-    //println(otherBlob.min.x);
+  void engulf(Blob otherBlob){
+    min.x = min(min.x, otherBlob.min.x);
+    min.y = min(min.y, otherBlob.min.y);
+    max.x = max(max.x, otherBlob.max.x);
+    max.y = max(max.y, otherBlob.max.y);
+  }
+  float area(){
+    return (max.x-min.x)*(max.y-min.y);
   }
 }

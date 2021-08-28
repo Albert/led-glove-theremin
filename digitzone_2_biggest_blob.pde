@@ -25,25 +25,35 @@ void draw() {
     for(int y=0;y<height;y+=1){ // TODO consider optimizing to single: for int i<width*height
       color c = cam.pixels[x + y * cam.width];
       if (dist(hue(c),saturation(c),brightness(c),hue(t),saturation(t),brightness(t))<0.1) {
-        Blob previousMatch = null;
+        int previousMatch = -1;
+        int toMerge = -1;
         for(int i=0;i<blobs.size();i++){
           Blob b = blobs.get(i);
           if (b.isNear(x,y)) {
             b.add(x,y);
-            if (previousMatch != null) {
-              b.mergeWith(previousMatch);
+            if (previousMatch != -1) {
+              toMerge = i;
             }
-            previousMatch = b;
+            previousMatch = i;
           }
         }
-        if (previousMatch == null) {
+        if (previousMatch == -1) {
           blobs.add(new Blob(x,y));
+        } else if (toMerge != -1) {
+          blobs.get(toMerge).engulf(blobs.get(previousMatch));
+          blobs.remove(previousMatch);
         }
       }
     }
   }
   image(cam,0,0);
+  int biggestIndex;
+  float biggestArea = 0;
   for(int i=0;i<blobs.size();i++){
+    if(biggestArea < blobs.get(i).area()) {
+      biggestIndex = i;
+      biggestArea = blobs.get(i).area();
+    }
     blobs.get(i).display();
   }
 }
