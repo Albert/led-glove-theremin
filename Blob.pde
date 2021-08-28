@@ -30,7 +30,7 @@ class Blob {
     stroke(.33,1,1);
     rect(min.x-threshold, min.y-threshold, max.x-min.x+threshold*2, max.y-min.y+threshold*2);
     stroke(.66,1,1);
-    rect((min.x+max.x)*.5-5, (min.y+max.y)*.5-5, 10, 10);
+    rect(center().x-5, center().y-5, 10, 10);
   }
   void engulf(Blob otherBlob){
     min.x = min(min.x, otherBlob.min.x);
@@ -40,5 +40,8 @@ class Blob {
   }
   float area(){
     return (max.x-min.x)*(max.y-min.y);
+  }
+  PVector center(){
+    return new PVector((min.x+max.x)*.5, (min.y+max.y)*.5);
   }
 }
