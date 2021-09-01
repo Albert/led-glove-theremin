@@ -2,10 +2,12 @@ class Blob {
   PVector min = new PVector();
   PVector max = new PVector();
   int threshold = 15;
+  color t;
 
-  Blob(int x, int y){
+  Blob(int x, int y, color in_t){
     min = new PVector(x,y);
     max = new PVector(x,y);
+    t = in_t;
   }
   
   boolean isNear(int x, int y){
