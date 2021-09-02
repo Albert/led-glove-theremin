@@ -4,7 +4,9 @@ ArrayList<Blob> blobs = new ArrayList<Blob>();
 ArrayList<Integer> targets = new ArrayList<Integer>();
 ArrayList<Integer> biggestBlobIndices = new ArrayList<Integer>();
 String[] cameras = Capture.list();
-PVector st; //screen target
+
+ArrayList<PVector> sts = new ArrayList<PVector>(); //screen targets
+PVector st;
 
 void setup() {
   size(640,480);
