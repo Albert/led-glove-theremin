@@ -6,15 +6,19 @@ ArrayList<Integer> biggestBlobIndices = new ArrayList<Integer>();
 String[] cameras = Capture.list();
 
 ArrayList<PVector> sts = new ArrayList<PVector>(); //screen targets
-PVector st;
+int currentStep = 0;
+int direction = 1;
+boolean flash = false;
 
 void setup() {
   size(640,480);
-  cam = new Capture(this, cameras[0]);
+  cam = new Capture(this, cameras[1]);
   //cam = new Capture(this, "pipeline:autovideosrc");
   cam.start();
   colorMode(HSB,1);
-  st = new PVector(random(width), random(height));
+  for (int i=0; i<4; i++) {
+    sts.add(new PVector(85+150*i, 15+150*i));
+  }
 }
 
 void mouseClicked() {
@@ -40,7 +44,7 @@ void draw() {
     for(int x=0;x<width;x+=1){
       for(int y=0;y<height;y+=1){ // TODO consider optimizing to single: for int i<width*height
         color c = cam.pixels[x + y * cam.width];
-        if (dist(hue(c),saturation(c),brightness(c),hue(t),saturation(t),brightness(t))<0.3) {
+        if (dist(hue(c),saturation(c),brightness(c),hue(t),saturation(t),brightness(t))<0.2) {
           int previousMatch = -1;
           int toMerge = -1;
           for(int i=0;i<blobs.size();i++){
@@ -73,14 +77,55 @@ void draw() {
   }
   image(cam,0,0);
   stroke(1);
-  rect(st.x, st.y, 20, 20);
 
-  for (int i = 0; i < biggestBlobIndices.size(); i++) {
-    if (biggestBlobIndices.get(i) != -1){
-      if (PVector.sub(blobs.get(biggestBlobIndices.get(i)).center(), st).mag() < 50) {
-        st = new PVector(random(width), random(height));
+  if (biggestBlobIndices.size() == 2){
+    int targetsHit = 0;
+    for (int i=0; i<2; i++) {
+      if (biggestBlobIndices.get(i) != -1){
+        int tindex;
+        if (currentStep%2==0){
+          tindex = currentStep+i;
+        } else {
+          tindex = (i==0) ? currentStep+1 : currentStep;
+        }
+        if (PVector.sub(blobs.get(biggestBlobIndices.get(i)).center(), sts.get(tindex)).mag() < 50) {
+          targetsHit++;
+        }
+        blobs.get(biggestBlobIndices.get(i)).display();
       }
-      blobs.get(biggestBlobIndices.get(i)).display();
     }
+    if (targetsHit==2){
+      flash = true;
+      currentStep+=direction;
+      if (currentStep==3){
+        direction = -1;
+        currentStep = 1;
+      } else if (currentStep==-1){
+        direction = 1;
+        currentStep = 1;
+      }
+    }
+    for (int i=0; i<2; i++){
+      push();
+      int cindex;
+      if (currentStep%2==0){
+        cindex = i;
+      } else {
+        cindex = (i==0) ? 1 : 0;
+      }
+      fill(targets.get(cindex));
+      rect(sts.get(currentStep+i).x, sts.get(currentStep+i).y, 10, 10);
+      pop();
+    }
+  } else {
+    push();
+    scale( -1, 1 );
+    translate(-cam.width, 0);
+    text("Pick two color points",100,100);
+    pop();
+  }
+  if (flash==true) {
+    clear();
+    flash = false;
   }
 }
