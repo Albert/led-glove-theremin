@@ -1,7 +1,7 @@
 import processing.video.*;
 import processing.sound.*;
 
-SinOsc sine;
+SawOsc sine;
 
 Capture cam;
 ArrayList<Blob> blobs = new ArrayList<Blob>();
@@ -26,7 +26,7 @@ void setup() {
   }
   
   // create and start the sine oscillator.
-  sine = new SinOsc(this);
+  sine = new SawOsc(this);
   sine.play();
   notes.add(196.00);
   notes.add(207.65);
@@ -52,6 +52,10 @@ void setup() {
   notes.add(659.25);
   notes.add(698.46);
   notes.add(739.99);
+  
+  targets.add(-197893);
+  targets.add(-4851204);
+
 }
 
 void mouseClicked() {
@@ -61,6 +65,15 @@ void mouseClicked() {
   }
 }
 
+void keyPressed() {
+  if (key=='1') {
+    // grade
+  } else if (key=='2') {
+    // floor
+  } else if (key=='3') {
+    // sequence
+  }
+}
 
 void draw() {
   translate(cam.width, 0);
@@ -133,7 +146,13 @@ void draw() {
       sine.freq(frequency);
       if (biggestBlobIndices.get(1) != -1) {
         float amplitude = map(blobs.get(biggestBlobIndices.get(0)).center().dist(blobs.get(biggestBlobIndices.get(1)).center()), 0, 100, 1.0, 0.0);
-        sine.amp(constrain(amplitude, 0, 1));
+        amplitude = constrain(amplitude, 0, 1);
+        if (amplitude == 0) {
+          sine.stop();
+        } else {
+          sine.play();
+          sine.amp(amplitude);
+        }
       }
     }
     
@@ -180,6 +199,7 @@ void draw() {
       fill(0,0,255);
     }
     float l = map(n, 180, 750, 0, width);
+    stroke(1,.25);
     line(l,0,l,height);
     pop();
   }
