@@ -1,4 +1,8 @@
 import processing.video.*;
+import processing.sound.*;
+
+SinOsc sine;
+
 Capture cam;
 ArrayList<Blob> blobs = new ArrayList<Blob>();
 ArrayList<Integer> targets = new ArrayList<Integer>();
@@ -9,6 +13,7 @@ ArrayList<PVector> sts = new ArrayList<PVector>(); //screen targets
 int currentStep = 0;
 int direction = 1;
 boolean flash = false;
+ArrayList<Float> notes = new ArrayList<Float>();
 
 void setup() {
   size(640,480);
@@ -19,6 +24,34 @@ void setup() {
   for (int i=0; i<4; i++) {
     sts.add(new PVector(85+150*i, 15+150*i));
   }
+  
+  // create and start the sine oscillator.
+  sine = new SinOsc(this);
+  sine.play();
+  notes.add(196.00);
+  notes.add(207.65);
+  notes.add(220.00);
+  notes.add(233.08);
+  notes.add(246.94);
+  notes.add(261.63);
+  notes.add(277.18);
+  notes.add(293.66);
+  notes.add(311.13);
+  notes.add(329.63);
+  notes.add(349.23);
+  notes.add(369.99);
+  notes.add(392.00);
+  notes.add(415.30);
+  notes.add(440.00);
+  notes.add(466.16);
+  notes.add(493.88);
+  notes.add(523.25);
+  notes.add(554.37);
+  notes.add(587.33);
+  notes.add(622.25);
+  notes.add(659.25);
+  notes.add(698.46);
+  notes.add(739.99);
 }
 
 void mouseClicked() {
@@ -94,6 +127,16 @@ void draw() {
         blobs.get(biggestBlobIndices.get(i)).display();
       }
     }
+    
+    if (biggestBlobIndices.get(0) != -1){
+      float frequency = map(width-blobs.get(biggestBlobIndices.get(0)).center().x, 0, width, 180.0, 750.0);
+      sine.freq(frequency);
+      if (biggestBlobIndices.get(1) != -1) {
+        float amplitude = map(blobs.get(biggestBlobIndices.get(0)).center().dist(blobs.get(biggestBlobIndices.get(1)).center()), 0, 100, 1.0, 0.0);
+        sine.amp(constrain(amplitude, 0, 1));
+      }
+    }
+    
     if (targetsHit==2){
       flash = true;
       currentStep+=direction;
@@ -127,5 +170,17 @@ void draw() {
   if (flash==true) {
     clear();
     flash = false;
+  }
+  for (int i = 0; i < notes.size(); i++){
+    push();
+    float n = notes.get(i);
+    
+    fill(0,255,0);
+    if (n==440) {
+      fill(0,0,255);
+    }
+    float l = map(n, 180, 750, 0, width);
+    line(l,0,l,height);
+    pop();
   }
 }
