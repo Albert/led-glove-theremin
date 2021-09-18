@@ -14,6 +14,11 @@ int currentStep = 0;
 int direction = 1;
 boolean flash = false;
 ArrayList<Float> notes = new ArrayList<Float>();
+ArrayList<Float> cmaj = new ArrayList<Float>();
+boolean theremin = true;
+boolean autotune = false;
+boolean scaleOnly = false;
+
 
 void setup() {
   size(640,480);
@@ -28,34 +33,35 @@ void setup() {
   // create and start the sine oscillator.
   sine = new SawOsc(this);
   sine.play();
-  notes.add(196.00);
+  notes.add(196.00); cmaj.add(196.00);
   notes.add(207.65);
-  notes.add(220.00);
+  notes.add(220.00); cmaj.add(220.00);
   notes.add(233.08);
-  notes.add(246.94);
-  notes.add(261.63);
+  notes.add(246.94); cmaj.add(246.94);
+  notes.add(261.63); cmaj.add(261.63);
   notes.add(277.18);
-  notes.add(293.66);
+  notes.add(293.66); cmaj.add(293.66);
   notes.add(311.13);
-  notes.add(329.63);
-  notes.add(349.23);
+  notes.add(329.63); cmaj.add(329.63);
+  notes.add(349.23); cmaj.add(349.23);
   notes.add(369.99);
-  notes.add(392.00);
+  notes.add(392.00); cmaj.add(392.00);
   notes.add(415.30);
-  notes.add(440.00);
+  notes.add(440.00); cmaj.add(440.00);
   notes.add(466.16);
-  notes.add(493.88);
-  notes.add(523.25);
+  notes.add(493.88); cmaj.add(493.88);
+  notes.add(523.25); cmaj.add(523.25);
   notes.add(554.37);
-  notes.add(587.33);
+  notes.add(587.33); cmaj.add(587.33);
   notes.add(622.25);
-  notes.add(659.25);
-  notes.add(698.46);
+  notes.add(659.25); cmaj.add(659.25);
+  notes.add(698.46); cmaj.add(698.46);
   notes.add(739.99);
+
+
   
   targets.add(-197893);
   targets.add(-4851204);
-
 }
 
 void mouseClicked() {
@@ -67,11 +73,18 @@ void mouseClicked() {
 
 void keyPressed() {
   if (key=='1') {
-    // grade
+    theremin = true;
+    autotune = false;
   } else if (key=='2') {
-    // floor
+    theremin = true;
+    autotune = true;
+    scaleOnly= false;
   } else if (key=='3') {
-    // sequence
+    theremin = true;
+    autotune = true;
+    scaleOnly= true;
+  } else if (key=='4') {
+    theremin = false;
   }
 }
 
@@ -141,19 +154,45 @@ void draw() {
       }
     }
     
-    if (biggestBlobIndices.get(0) != -1){
-      float frequency = map(width-blobs.get(biggestBlobIndices.get(0)).center().x, 0, width, 180.0, 750.0);
-      sine.freq(frequency);
-      if (biggestBlobIndices.get(1) != -1) {
-        float amplitude = map(blobs.get(biggestBlobIndices.get(0)).center().dist(blobs.get(biggestBlobIndices.get(1)).center()), 0, 100, 1.0, 0.0);
-        amplitude = constrain(amplitude, 0, 1);
-        if (amplitude == 0) {
-          sine.stop();
-        } else {
-          sine.play();
-          sine.amp(amplitude);
+    if (theremin == true){
+      if (biggestBlobIndices.get(0) != -1){
+        float frequency = map(width-blobs.get(biggestBlobIndices.get(0)).center().x, 0, width, 180.0, 750.0);
+        if (autotune == true) {
+          int n = 0;
+          if (scaleOnly==true) {
+            while(n < cmaj.size()) {
+              if (frequency < cmaj.get(n)){
+                frequency = cmaj.get(n);
+                n = cmaj.size();
+              } else {
+                n++;
+              }
+            }
+          } else {
+            while(n < notes.size()) {
+              if (frequency < notes.get(n)){
+                frequency = notes.get(n);
+                n = notes.size();
+              } else {
+                n++;
+              }
+            }
+          }
+        }
+        sine.freq(frequency);
+        if (biggestBlobIndices.get(1) != -1) {
+          float amplitude = map(blobs.get(biggestBlobIndices.get(0)).center().dist(blobs.get(biggestBlobIndices.get(1)).center()), 0, 100, 1.0, 0.0);
+          amplitude = constrain(amplitude, 0, 1);
+          if (amplitude == 0) {
+            sine.stop();
+          } else {
+            sine.play();
+            sine.amp(amplitude);
+          }
         }
       }
+    } else {
+      sine.stop();
     }
     
     if (targetsHit==2){
@@ -168,16 +207,18 @@ void draw() {
       }
     }
     for (int i=0; i<2; i++){
-      push();
-      int cindex;
-      if (currentStep%2==0){
-        cindex = i;
-      } else {
-        cindex = (i==0) ? 1 : 0;
+      if (theremin==false) {
+        push();
+        int cindex;
+        if (currentStep%2==0){
+          cindex = i;
+        } else {
+          cindex = (i==0) ? 1 : 0;
+        }
+        fill(targets.get(cindex));
+        rect(sts.get(currentStep+i).x, sts.get(currentStep+i).y, 10, 10);
+        pop();
       }
-      fill(targets.get(cindex));
-      rect(sts.get(currentStep+i).x, sts.get(currentStep+i).y, 10, 10);
-      pop();
     }
   } else {
     push();
@@ -190,17 +231,40 @@ void draw() {
     clear();
     flash = false;
   }
-  for (int i = 0; i < notes.size(); i++){
-    push();
-    float n = notes.get(i);
-    
-    fill(0,255,0);
-    if (n==440) {
-      fill(0,0,255);
+  if (theremin == true) {
+    if (scaleOnly == true) {
+      for (int i = 0; i < cmaj.size(); i++){
+        push();
+        float n = cmaj.get(i);
+        
+        fill(0,255,0);
+        if (n==440) {
+          fill(0,0,255);
+        }
+        //float frequency = map(width-blobs.get(biggestBlobIndices.get(0)).center().x, 0, width, 180.0, 750.0);
+  
+        float l = map(n, 180, 750, width,0);
+        stroke(1,.25);
+        line(l,0,l,height);
+        pop();
+      }
+    } else {
+      for (int i = 0; i < notes.size(); i++){
+        push();
+        float n = notes.get(i);
+        
+        fill(0,255,0);
+        if (n==440) {
+          fill(0,0,255);
+        }
+        //float frequency = map(width-blobs.get(biggestBlobIndices.get(0)).center().x, 0, width, 180.0, 750.0);
+  
+        float l = map(n, 180, 750, width,0);
+        stroke(1,.25);
+        line(l,0,l,height);
+        pop();
+      }
+
     }
-    float l = map(n, 180, 750, 0, width);
-    stroke(1,.25);
-    line(l,0,l,height);
-    pop();
   }
 }
