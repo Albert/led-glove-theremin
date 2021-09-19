@@ -1,7 +1,7 @@
 import processing.video.*;
 import processing.sound.*;
 
-SawOsc sine;
+ArrayList<SawOsc> oscs = new ArrayList<SawOsc>();
 
 Capture cam;
 ArrayList<Blob> blobs = new ArrayList<Blob>();
@@ -31,8 +31,10 @@ void setup() {
   }
   
   // create and start the sine oscillator.
-  sine = new SawOsc(this);
-  sine.play();
+  for (int i = 0; i<4; i++) {
+    oscs.add(new SawOsc(this));
+    if (i==0)oscs.get(i).play();
+  }
   notes.add(196.00); cmaj.add(196.00);
   notes.add(207.65);
   notes.add(220.00); cmaj.add(220.00);
@@ -58,11 +60,18 @@ void setup() {
   notes.add(698.46); cmaj.add(698.46);
   notes.add(739.99);
 
+/*
+  targets.add(-62704);
+  targets.add(-14680065);
+  targets.add(-66561);
+  targets.add(-3230552);
+  targets.add(-10241);
+*/
   targets.add(-12853515); // blue
-  targets.add(-2138000);  // red
+  targets.add(-697489);  // red
   targets.add(-9122158);  // green
-  targets.add(-132371);   // yellow
-  targets.add(-205061);   // pink
+  targets.add(-1191498);   // yellow
+  targets.add(-19202);   // pink
 }
 
 void mouseClicked() {
@@ -110,7 +119,8 @@ void draw() {
     for(int x=0;x<width;x+=1){
       for(int y=0;y<height;y+=1){ // TODO consider optimizing to single: for int i<width*height
         color c = cam.pixels[x + y * cam.width];
-        if (dist(hue(c),saturation(c),brightness(c),hue(t),saturation(t),brightness(t))<0.2) {
+        if (dist(hue(c),saturation(c),brightness(c),hue(t),saturation(t),brightness(t))<0.15) {
+//        if (brightness(c) > 0.5 && abs(hue(c)-hue(t))<0.005) {
           int previousMatch = -1;
           int toMerge = -1;
           for(int i=0;i<blobs.size();i++){
@@ -188,20 +198,53 @@ void draw() {
             }
           }
         }
-        sine.freq(frequency);
+        oscs.get(0).freq(frequency);
         if (biggestBlobIndices.get(1) != -1) {
           float amplitude = map(blobs.get(biggestBlobIndices.get(0)).center().dist(blobs.get(biggestBlobIndices.get(1)).center()), 0, 100, 1.0, 0.0);
           amplitude = constrain(amplitude, 0, 1);
           if (amplitude == 0) {
-            sine.stop();
+            oscs.get(0).stop();
           } else {
-            sine.play();
-            sine.amp(amplitude);
+            oscs.get(0).play();
+            oscs.get(0).amp(amplitude);
+          }
+        }
+        oscs.get(1).freq(frequency*1.25);
+        if (biggestBlobIndices.get(2) != -1) {
+          float amplitude = map(blobs.get(biggestBlobIndices.get(0)).center().dist(blobs.get(biggestBlobIndices.get(2)).center()), 0, 100, 1.0, 0.0);
+          amplitude = constrain(amplitude, 0, 1);
+          if (amplitude == 0) {
+            oscs.get(1).stop();
+          } else {
+            oscs.get(1).play();
+            oscs.get(1).amp(amplitude);
+          }
+        }
+        oscs.get(2).freq(frequency*1.5);
+        if (biggestBlobIndices.get(3) != -1) {
+          float amplitude = map(blobs.get(biggestBlobIndices.get(0)).center().dist(blobs.get(biggestBlobIndices.get(3)).center()), 0, 100, 1.0, 0.0);
+          amplitude = constrain(amplitude, 0, 1);
+          if (amplitude == 0) {
+            oscs.get(2).stop();
+          } else {
+            oscs.get(2).play();
+            oscs.get(2).amp(amplitude);
+          }
+        }
+        oscs.get(3).freq(frequency*2);
+        if (biggestBlobIndices.get(4) != -1) {
+          float amplitude = map(blobs.get(biggestBlobIndices.get(0)).center().dist(blobs.get(biggestBlobIndices.get(4)).center()), 0, 100, 1.0, 0.0);
+          amplitude = constrain(amplitude, 0, 1);
+          if (amplitude == 0) {
+            oscs.get(3).stop();
+          } else {
+            oscs.get(3).play();
+            oscs.get(3).amp(amplitude);
           }
         }
       }
     } else {
-      sine.stop();
+      oscs.get(0).stop();
     }
     
     if (targetsHit==2){
