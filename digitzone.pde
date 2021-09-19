@@ -58,20 +58,27 @@ void setup() {
   notes.add(698.46); cmaj.add(698.46);
   notes.add(739.99);
 
-
-  
-  targets.add(-197893);
-  targets.add(-4851204);
+  targets.add(-12853515); // blue
+  targets.add(-2138000);  // red
+  targets.add(-9122158);  // green
+  targets.add(-132371);   // yellow
+  targets.add(-205061);   // pink
 }
 
 void mouseClicked() {
   targets.add(cam.get(width-mouseX,mouseY));
-  if (targets.size() > 2) {
+  if (targets.size() > 5) {
     targets.remove(0);
   }
 }
 
 void keyPressed() {
+  
+  if (key==' ') {
+    for (int i = 0; i < targets.size(); i++){
+      println(targets.get(i));
+    }
+  }
   if (key=='1') {
     theremin = true;
     autotune = false;
@@ -137,18 +144,20 @@ void draw() {
   image(cam,0,0);
   stroke(1);
 
-  if (biggestBlobIndices.size() == 2){
+  if (biggestBlobIndices.size() == 5){
     int targetsHit = 0;
-    for (int i=0; i<2; i++) {
+    for (int i=0; i<5; i++) {
       if (biggestBlobIndices.get(i) != -1){
-        int tindex;
-        if (currentStep%2==0){
-          tindex = currentStep+i;
-        } else {
-          tindex = (i==0) ? currentStep+1 : currentStep;
-        }
-        if (PVector.sub(blobs.get(biggestBlobIndices.get(i)).center(), sts.get(tindex)).mag() < 50) {
-          targetsHit++;
+        if (i<2) {
+          int tindex;
+          if (currentStep%2==0){
+            tindex = currentStep+i;
+          } else {
+            tindex = (i==0) ? currentStep+1 : currentStep;
+          }
+          if (PVector.sub(blobs.get(biggestBlobIndices.get(i)).center(), sts.get(tindex)).mag() < 50) {
+            targetsHit++;
+          }
         }
         blobs.get(biggestBlobIndices.get(i)).display();
       }

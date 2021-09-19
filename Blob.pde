@@ -1,7 +1,7 @@
 class Blob {
   PVector min = new PVector();
   PVector max = new PVector();
-  int threshold = 15;
+  int threshold = 5;
   color t;
 
   Blob(int x, int y, color in_t){
