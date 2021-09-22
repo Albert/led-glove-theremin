@@ -115,8 +115,8 @@ void draw() {
   biggestBlobIndices.clear();
   for(int targetIndex = 0; targetIndex < targets.size(); targetIndex++) {
     color t = targets.get(targetIndex);
-    for(int x=0;x<width;x+=1){
-      for(int y=0;y<height;y+=1){ // TODO consider optimizing to single: for int i<width*height
+    for(int x=0;x<width;x+=2){
+      for(int y=0;y<height;y+=2){ // TODO consider optimizing to single: for int i<width*height
         color c = cam.pixels[x + y * cam.width];
         if (dist(hue(c),saturation(c),brightness(c),hue(t),saturation(t),brightness(t))<0.15) {
 //        if (brightness(c) > 0.5 && abs(hue(c)-hue(t))<0.005) {
