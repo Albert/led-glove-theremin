@@ -33,7 +33,6 @@ void setup() {
   // create and start the sine oscillator.
   for (int i = 0; i<4; i++) {
     oscs.add(new SawOsc(this));
-    if (i==0)oscs.get(i).play();
   }
   notes.add(196.00); cmaj.add(196.00);
   notes.add(207.65);
@@ -156,22 +155,26 @@ void draw() {
 
   if (biggestBlobIndices.size() == 5){
     int targetsHit = 0;
+    for (int i=0; i<2; i++) {
+      if (biggestBlobIndices.get(i+1) != -1){
+        int tindex;
+        if (currentStep%2==0){
+          tindex = currentStep+i;
+        } else {
+          tindex = (i==0) ? currentStep+1 : currentStep;
+        }
+        if (PVector.sub(blobs.get(biggestBlobIndices.get(i+1)).center(), sts.get(tindex)).mag() < 50) {
+          targetsHit++;
+        }
+      }
+    }
+
     for (int i=0; i<5; i++) {
       if (biggestBlobIndices.get(i) != -1){
-        if (i<2) {
-          int tindex;
-          if (currentStep%2==0){
-            tindex = currentStep+i;
-          } else {
-            tindex = (i==0) ? currentStep+1 : currentStep;
-          }
-          if (PVector.sub(blobs.get(biggestBlobIndices.get(i)).center(), sts.get(tindex)).mag() < 50) {
-            targetsHit++;
-          }
-        }
         blobs.get(biggestBlobIndices.get(i)).display();
       }
     }
+
     
     if (theremin == true){
       if (biggestBlobIndices.get(0) != -1){
@@ -208,6 +211,8 @@ void draw() {
             oscs.get(0).play();
             oscs.get(0).amp(amplitude);
           }
+        } else {
+          oscs.get(0).stop();
         }
         oscs.get(1).freq(frequency*1.25);
         if (biggestBlobIndices.get(2) != -1) {
@@ -219,6 +224,8 @@ void draw() {
             oscs.get(1).play();
             oscs.get(1).amp(amplitude);
           }
+        } else {
+          oscs.get(1).stop();
         }
         oscs.get(2).freq(frequency*1.5);
         if (biggestBlobIndices.get(3) != -1) {
@@ -230,6 +237,8 @@ void draw() {
             oscs.get(2).play();
             oscs.get(2).amp(amplitude);
           }
+        } else {
+          oscs.get(2).stop();
         }
         oscs.get(3).freq(frequency*2);
         if (biggestBlobIndices.get(4) != -1) {
@@ -241,6 +250,8 @@ void draw() {
             oscs.get(3).play();
             oscs.get(3).amp(amplitude);
           }
+        } else {
+          oscs.get(3).stop();
         }
       }
     } else {
@@ -267,8 +278,13 @@ void draw() {
         } else {
           cindex = (i==0) ? 1 : 0;
         }
+        cindex++;
         fill(targets.get(cindex));
+        stroke(targets.get(cindex));
         rect(sts.get(currentStep+i).x, sts.get(currentStep+i).y, 10, 10);
+        if (biggestBlobIndices.get(cindex) != -1) {
+          line(sts.get(currentStep+i).x, sts.get(currentStep+i).y, blobs.get(biggestBlobIndices.get(cindex)).center().x, blobs.get(biggestBlobIndices.get(cindex)).center().y);
+        }
         pop();
       }
     }

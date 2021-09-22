@@ -28,11 +28,11 @@ class Blob {
   void display() {
     fill(1,0);
     stroke(1,1,1);
-    rect(min.x, min.y, max.x-min.x, max.y-min.y);
+    //rect(min.x, min.y, max.x-min.x, max.y-min.y);
     stroke(.33,1,1);
-    rect(min.x-threshold, min.y-threshold, max.x-min.x+threshold*2, max.y-min.y+threshold*2);
+    //rect(min.x-threshold, min.y-threshold, max.x-min.x+threshold*2, max.y-min.y+threshold*2);
     stroke(.66,1,1);
-    rect(center().x-5, center().y-5, 10, 10);
+    //rect(center().x-5, center().y-5, 10, 10);
   }
   void engulf(Blob otherBlob){
     min.x = min(min.x, otherBlob.min.x);
